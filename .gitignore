@@ -1,0 +1,16 @@
+# Maven
+target/
+*.log
+
+# Sonar
+.sonar/
+**/sonar/
+
+# IDE
+.idea/
+.vscode/
+*.iml
+
+# OS
+.DS_Store
+
