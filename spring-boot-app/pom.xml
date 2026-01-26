@@ -50,7 +50,7 @@
     </dependencies>
     <distributionManagement>
         <repository>
-            <id>nexus</id>
+            <id>nexus-releases1</id>
             <name>nexus-releases1</name>
             <url>http://192.168.192.130:8081/repository/nexus-releases1/</url>
         </repository>
