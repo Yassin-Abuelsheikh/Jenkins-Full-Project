@@ -1,38 +1,36 @@
 pipeline {
     agent any
 
-    tools {
-        maven 'maven'   
-    }
-
     environment {
         DOCKERHUB_REPO = "yassinahmed10/spring-boot-app"
         IMAGE_TAG      = "${BUILD_NUMBER}"
-        NEXUS_REPO_URL = "http://192.168.192.130:8081/repository/nexus-releases1/"
     }
 
     stages {
 
         stage('Checkout Code') {
             steps {
-                git branch: 'main',
-                    url: 'https://github.com/Yassin-Abuelsheikh/Jenkins-Full-Project.git'
+                checkout scm
             }
         }
 
         stage('Build & Test') {
             steps {
-                sh 'mvn clean verify'
+                dir('spring-boot-app') {
+                    sh 'mvn clean verify'
+                }
             }
         }
 
         stage('SonarQube Analysis') {
             steps {
-                withSonarQubeEnv('sonarqube') {
-                    sh '''
-                      mvn clean verify \
-                      org.sonarsource.scanner.maven:sonar-maven-plugin:3.9.1.2184:sonar
-                    '''
+                dir('spring-boot-app') {
+                    withSonarQubeEnv('sonarqube') {
+                        sh '''
+                          mvn clean verify \
+                          org.sonarsource.scanner.maven:sonar-maven-plugin:3.9.1.2184:sonar
+                        '''
+                    }
                 }
             }
         }
@@ -47,25 +45,27 @@ pipeline {
 
         stage('Publish Artifact to Nexus') {
             steps {
-                withCredentials([usernamePassword(
-                    credentialsId: 'nexus-creds',
-                    usernameVariable: 'NEXUS_USER',
-                    passwordVariable: 'NEXUS_PASS'
-                )]) {
-                    sh '''
-                      mvn deploy \
-                      -Dnexus.username=$NEXUS_USER \
-                      -Dnexus.password=$NEXUS_PASS
-                    '''
+                dir('spring-boot-app') {
+                    withCredentials([usernamePassword(
+                        credentialsId: 'nexus-creds',
+                        usernameVariable: 'NEXUS_USER',
+                        passwordVariable: 'NEXUS_PASS'
+                    )]) {
+                        sh '''
+                          mvn deploy
+                        '''
+                    }
                 }
             }
         }
 
         stage('Build Docker Image') {
             steps {
-                sh '''
-                  docker build -t $DOCKERHUB_REPO:$IMAGE_TAG .
-                '''
+                dir('spring-boot-app') {
+                    sh '''
+                      docker build -t $DOCKERHUB_REPO:$IMAGE_TAG .
+                    '''
+                }
             }
         }
 
@@ -87,20 +87,20 @@ pipeline {
     post {
         failure {
             emailext(
-                subject: " Jenkins Pipeline Failed: ${JOB_NAME} #${BUILD_NUMBER}",
+                subject: "❌ Jenkins Pipeline Failed: ${JOB_NAME} #${BUILD_NUMBER}",
                 body: """
-                Pipeline Failed 
+Pipeline Failed ❌
 
-                Job: ${JOB_NAME}
-                Build Number: ${BUILD_NUMBER}
-                Build URL: ${BUILD_URL}
-                """,
+Job: ${JOB_NAME}
+Build Number: ${BUILD_NUMBER}
+Build URL: ${BUILD_URL}
+""",
                 to: "yassinabuelsheikh@gmail.com"
             )
         }
 
         success {
-            echo "Pipeline completed successfully"
+            echo "✅ Pipeline completed successfully"
         }
     }
 }
