@@ -1,6 +1,11 @@
 pipeline {
     agent any
 
+    tools {
+        maven 'maven'
+        jdk 'jdk11'
+    }
+
     environment {
         DOCKERHUB_REPO = "yassinahmed10/spring-boot-app"
         IMAGE_TAG      = "${BUILD_NUMBER}"
@@ -14,7 +19,7 @@ pipeline {
             }
         }
 
-        stage('Build & Test') {
+        stage('Build & Unit Tests') {
             steps {
                 dir('spring-boot-app') {
                     sh 'mvn clean verify'
@@ -27,8 +32,9 @@ pipeline {
                 dir('spring-boot-app') {
                     withSonarQubeEnv('sonarqube') {
                         sh '''
-                          mvn clean verify \
-                          org.sonarsource.scanner.maven:sonar-maven-plugin:3.9.1.2184:sonar
+                          mvn sonar:sonar \
+                          -Dsonar.coverage.jacoco.xmlReportPaths=target/site/jacoco/jacoco.xml \
+                          -Dsonar.ws.timeout=120
                         '''
                     }
                 }
@@ -37,7 +43,7 @@ pipeline {
 
         stage('Quality Gate') {
             steps {
-                timeout(time: 2, unit: 'MINUTES') {
+                timeout(time: 5, unit: 'MINUTES') {
                     waitForQualityGate abortPipeline: true
                 }
             }
@@ -46,15 +52,7 @@ pipeline {
         stage('Publish Artifact to Nexus') {
             steps {
                 dir('spring-boot-app') {
-                    withCredentials([usernamePassword(
-                        credentialsId: 'nexus-creds',
-                        usernameVariable: 'NEXUS_USER',
-                        passwordVariable: 'NEXUS_PASS'
-                    )]) {
-                        sh '''
-                          mvn deploy
-                        '''
-                    }
+                    sh 'mvn deploy -DskipTests'
                 }
             }
         }
@@ -62,9 +60,7 @@ pipeline {
         stage('Build Docker Image') {
             steps {
                 dir('spring-boot-app') {
-                    sh '''
-                      docker build -t $DOCKERHUB_REPO:$IMAGE_TAG .
-                    '''
+                    sh 'docker build -t $DOCKERHUB_REPO:$IMAGE_TAG .'
                 }
             }
         }
@@ -87,7 +83,7 @@ pipeline {
     post {
         failure {
             emailext(
-                subject: "❌ Jenkins Pipeline Failed: ${JOB_NAME} #${BUILD_NUMBER}",
+                subject: " Jenkins Pipeline Failed: ${JOB_NAME} #${BUILD_NUMBER}",
                 body: """
 Pipeline Failed ❌
 
@@ -100,7 +96,7 @@ Build URL: ${BUILD_URL}
         }
 
         success {
-            echo "✅ Pipeline completed successfully"
+            echo "Pipeline completed successfully ✅"
         }
     }
 }
