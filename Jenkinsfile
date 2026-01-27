@@ -1,11 +1,6 @@
 pipeline {
     agent any
 
-    tools {
-        maven 'maven'
-        jdk 'jdk11'
-    }
-
     environment {
         DOCKERHUB_REPO = "yassinahmed10/spring-boot-app"
         IMAGE_TAG      = "${BUILD_NUMBER}"
