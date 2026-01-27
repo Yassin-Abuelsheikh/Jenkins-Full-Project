@@ -67,6 +67,25 @@ Each image is tagged using the Jenkins build number to ensure:
 
 ---
 
+## ✅ Jenkins Pipeline – Full Successful Execution
+
+![Jenkins Pipeline Success]<img width="1600" height="802" alt="image" src="https://github.com/user-attachments/assets/cb2110c0-36f3-4e78-8269-e3ff28d9cca4" />
+
+**Description:**
+This image shows the **final successful execution of the Jenkins CI/CD pipeline** after all stages have passed successfully.
+
+The pipeline includes:
+- Checkout source code from GitHub
+- Build & unit tests using Maven
+- SonarQube static code analysis
+- Quality Gate validation (PASSED)
+- Publishing the artifact to Nexus Repository
+- Building the Docker image
+- Pushing the Docker image to Docker Hub
+- Post-build actions and notifications
+
+---
+
 ## 🚀 GitOps Workflow with Argo CD
 
 ![Argo GitOps](docs/images/Argo%20CD_GitOps%20workflow.jpeg)
@@ -79,25 +98,6 @@ This diagram demonstrates the **GitOps deployment model**:
 - Any change is automatically synchronized to the cluster  
 
 No manual deployment commands are required.
-
----
-
-## ✅ Jenkins Pipeline – Full Successful Execution
-
-![Jenkins Pipeline Success]<img width="1600" height="802" alt="image" src="https://github.com/user-attachments/assets/cb2110c0-36f3-4e78-8269-e3ff28d9cca4" />
-
-**Description:**  
-This image shows the **final successful execution of the Jenkins CI/CD pipeline** after all stages have passed successfully.
-
-The pipeline includes:
-- Checkout source code from GitHub
-- Build & unit tests using Maven
-- SonarQube static code analysis
-- Quality Gate validation (PASSED)
-- Publishing the artifact to Nexus Repository
-- Building the Docker image
-- Pushing the Docker image to Docker Hub
-- Post-build actions and notifications
 
 All stages are marked in green, confirming that the application is **ready for deployment** and can safely move to the **continuous delivery phase using GitOps (Argo CD)**.
 ## 📊 Argo CD Application – Live Kubernetes State
