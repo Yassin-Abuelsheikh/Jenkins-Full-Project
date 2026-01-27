@@ -27,7 +27,7 @@ pipeline {
                 dir('spring-boot-app') {
                     withSonarQubeEnv('sonarqube') {
                         sh '''
-                          mvn sonar:sonar \
+                           mvn org.sonarsource.scanner.maven:sonar-maven-plugin:3.9.1.2184:sonar \
                           -Dsonar.coverage.jacoco.xmlReportPaths=target/site/jacoco/jacoco.xml \
                           -Dsonar.ws.timeout=120
                         '''
