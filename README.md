@@ -2,36 +2,17 @@
 
 This repository demonstrates a **complete end-to-end DevOps workflow** for a **Spring Boot application**, starting from CI/CD automation, passing through **SonarQube Quality Gates**, artifact management, containerization, and ending with **GitOps-based deployment using Argo CD on Kubernetes**.
 
-🔗 **Repository:**  
-https://github.com/Yassin-Abuelsheikh/Jenkins-Full-Project
-
 ---
 
 ## 🧩 CI/CD High-Level Architecture
 
-![CI/CD Diagram](docs/images/Diagram%20of%20CI-CD.png)
+![CI/CD Diagram]<img width="1321" height="659" alt="image" src="https://github.com/user-attachments/assets/479f39dd-3085-4999-af7f-1a009e08e380" />
 
 **Description:**  
 This diagram illustrates the complete CI/CD architecture used in this project.  
 A code push to GitHub triggers Jenkins, which runs build, test, and quality analysis stages.  
 Artifacts are published to Nexus, Docker images are pushed to Docker Hub, and deployment is handled using GitOps with Argo CD.
 
----
-
-## 🧪 SonarQube Analysis – Code Issues Detected
-
-![SonarQube Testing Code](docs/images/sonarQube%20testing%20code.jpeg)
-
-**Description:**  
-This stage shows SonarQube scanning the source code and detecting:
-- Bugs
-- Code smells
-- Security issues
-- Test coverage problems  
-
-At this point, the code does **not fully comply** with Quality Gate rules.
-
----
 
 ## 📧 Failure Notification – Email Alert
 
@@ -101,7 +82,27 @@ No manual deployment commands are required.
 
 ---
 
+## ✅ Jenkins Pipeline – Full Successful Execution
+
+![Jenkins Pipeline Success]<img width="1600" height="802" alt="image" src="https://github.com/user-attachments/assets/cb2110c0-36f3-4e78-8269-e3ff28d9cca4" />
+
+**Description:**  
+This image shows the **final successful execution of the Jenkins CI/CD pipeline** after all stages have passed successfully.
+
+The pipeline includes:
+- Checkout source code from GitHub
+- Build & unit tests using Maven
+- SonarQube static code analysis
+- Quality Gate validation (PASSED)
+- Publishing the artifact to Nexus Repository
+- Building the Docker image
+- Pushing the Docker image to Docker Hub
+- Post-build actions and notifications
+
+All stages are marked in green, confirming that the application is **ready for deployment** and can safely move to the **continuous delivery phase using GitOps (Argo CD)**.
 ## 📊 Argo CD Application – Live Kubernetes State
+
+---
 
 ![Argo App](docs/images/Argo_app.jpeg)
 
