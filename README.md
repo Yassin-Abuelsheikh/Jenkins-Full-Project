@@ -18,22 +18,6 @@ Artifacts are published to Nexus, Docker images are pushed to Docker Hub, and de
 
 ---
 
-## 🔁 Jenkins CI/CD Pipeline Execution
-
-![Jenkins Pipeline](docs/images/Jenkins%20Pipeline%20Workflow.jpeg)
-
-**Description:**  
-This screenshot shows the Jenkins declarative pipeline executing all CI stages:
-- Source code checkout
-- Build & unit tests with Maven
-- SonarQube analysis
-- Quality Gate validation
-- Artifact publishing to Nexus
-- Docker image build
-- Docker image push to Docker Hub
-
----
-
 ## 🧪 SonarQube Analysis – Code Issues Detected
 
 ![SonarQube Testing Code](docs/images/sonarQube%20testing%20code.jpeg)
@@ -46,23 +30,6 @@ This stage shows SonarQube scanning the source code and detecting:
 - Test coverage problems  
 
 At this point, the code does **not fully comply** with Quality Gate rules.
-
----
-
-## ❌ SonarQube Quality Gate – FAILED
-
-![Quality Gate Failed](docs/images/QualityGate.png)
-
-**Description:**  
-This image shows a **failed SonarQube Quality Gate**.  
-Because the defined quality standards were not met, the Jenkins pipeline is **immediately stopped**.
-
-Key behavior:
-- Deployment is blocked
-- Artifact publishing does not proceed
-- Pipeline is marked as failed
-
-This prevents bad-quality code from reaching later stages.
 
 ---
 
@@ -83,7 +50,8 @@ This ensures fast feedback and quick issue resolution.
 
 ## ✅ SonarQube Quality Gate – PASSED
 
-![SonarQube Passed](docs/images/sonarQube%20testing%20code.jpeg)
+![SonarQube Passed]<img width="1567" height="728" alt="image" src="https://github.com/user-attachments/assets/4b6de6e2-ba86-484e-a86a-3bef785816b5" />
+
 
 **Description:**  
 After fixing the detected issues and improving code quality, the SonarQube analysis passes successfully.  
@@ -177,4 +145,5 @@ This project represents a **real-world DevOps pipeline** that closely mirrors pr
 It demonstrates how CI, code quality enforcement, artifact management, containerization, and GitOps can be integrated into a single automated workflow.
 
 ⭐ Feel free to star the repository and extend it with monitoring, logging, or security scanning.
+
 
