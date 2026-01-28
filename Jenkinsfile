@@ -4,6 +4,10 @@ pipeline {
     environment {
         DOCKERHUB_REPO = "yassinahmed10/spring-boot-app"
         IMAGE_TAG      = "${BUILD_NUMBER}"
+
+        AWS_REGION     = "us-east-1"
+        AWS_ACCOUNT_ID = "328911924204"
+        ECR_REPO       = "spring-boot-app"
     }
 
     stages {
@@ -27,7 +31,7 @@ pipeline {
                 dir('spring-boot-app') {
                     withSonarQubeEnv('sonarqube') {
                         sh '''
-                           mvn org.sonarsource.scanner.maven:sonar-maven-plugin:3.9.1.2184:sonar \
+                          mvn org.sonarsource.scanner.maven:sonar-maven-plugin:3.9.1.2184:sonar \
                           -Dsonar.coverage.jacoco.xmlReportPaths=target/site/jacoco/jacoco.xml \
                           -Dsonar.ws.timeout=120
                         '''
@@ -40,6 +44,19 @@ pipeline {
             steps {
                 timeout(time: 5, unit: 'MINUTES') {
                     waitForQualityGate abortPipeline: true
+                }
+            }
+        }
+
+        stage('OWASP Dependency Check') {
+            steps {
+                dir('spring-boot-app') {
+                    dependencyCheck additionalArguments: '''
+                      --scan .
+                      --format XML
+                      --out target
+                      --failOnCVSS 9
+                    ''', odcInstallation: 'OWASP-Dependency-Check'
                 }
             }
         }
@@ -60,7 +77,20 @@ pipeline {
             }
         }
 
-        stage('Push Docker Image') {
+        stage('Trivy Image Scan (CRITICAL only)') {
+            steps {
+                sh '''
+                  docker run --rm \
+                  -v /var/run/docker.sock:/var/run/docker.sock \
+                  aquasec/trivy:latest image \
+                  --severity CRITICAL \
+                  --exit-code 1 \
+                  $DOCKERHUB_REPO:$IMAGE_TAG
+                '''
+            }
+        }
+
+        stage('Push Docker Image to Docker Hub') {
             steps {
                 withCredentials([string(
                     credentialsId: 'dockerhub-creds',
@@ -73,12 +103,33 @@ pipeline {
                 }
             }
         }
+
+        stage('Push Docker Image to AWS ECR') {
+            steps {
+                withCredentials([[
+                    $class: 'AmazonWebServicesCredentialsBinding',
+                    credentialsId: 'aws-ecr-creds'
+                ]]) {
+                    sh '''
+                      aws ecr get-login-password --region $AWS_REGION \
+                      | docker login --username AWS --password-stdin \
+                      $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com
+
+                      docker tag $DOCKERHUB_REPO:$IMAGE_TAG \
+                      $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$ECR_REPO:$IMAGE_TAG
+
+                      docker push \
+                      $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$ECR_REPO:$IMAGE_TAG
+                    '''
+                }
+            }
+        }
     }
 
     post {
         failure {
             emailext(
-                subject: " Jenkins Pipeline Failed: ${JOB_NAME} #${BUILD_NUMBER}",
+                subject: "Jenkins Pipeline Failed: ${JOB_NAME} #${BUILD_NUMBER}",
                 body: """
 Pipeline Failed ❌
 
