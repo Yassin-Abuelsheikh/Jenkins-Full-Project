@@ -48,15 +48,20 @@ pipeline {
             }
         }
 
+        /* ================= OWASP Dependency Check ================= */
+
         stage('OWASP Dependency Check') {
             steps {
                 dir('spring-boot-app') {
-                    dependencyCheck additionalArguments: '''
-                      --scan .
-                      --format XML
-                      --out target
-                      --failOnCVSS 9
-                    ''', odcInstallation: 'OWASP-Dependency-Check'
+                    withCredentials([string(credentialsId: 'nvd-api-key', variable: 'NVD_API_KEY')]) {
+                        dependencyCheck additionalArguments: """
+                          --scan .
+                          --nvdApiKey ${NVD_API_KEY}
+                          --format XML
+                          --out target
+                          --failOnCVSS 9
+                        """, odcInstallation: 'OWASP-Dependency-Check'
+                    }
                 }
             }
         }
@@ -77,6 +82,8 @@ pipeline {
             }
         }
 
+        /* ================= Trivy Image Scan ================= */
+
         stage('Trivy Image Scan (CRITICAL only)') {
             steps {
                 sh '''
@@ -84,6 +91,9 @@ pipeline {
                   -v /var/run/docker.sock:/var/run/docker.sock \
                   aquasec/trivy:latest image \
                   --severity CRITICAL \
+                  --timeout 10m \
+                  --scanners vuln \
+                  --no-progress \
                   --exit-code 1 \
                   $DOCKERHUB_REPO:$IMAGE_TAG
                 '''
