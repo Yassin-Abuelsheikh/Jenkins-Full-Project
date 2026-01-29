@@ -1,29 +1,33 @@
 package com.abhishek;
 
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.web.reactive.server.WebTestClient;
-import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.web.servlet.MockMvc;
 
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@AutoConfigureWebTestClient
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+
+@SpringBootTest
+@AutoConfigureMockMvc
 class StartApplicationTest {
 
     @Autowired
-    private WebTestClient webTestClient;
+    private MockMvc mockMvc;
 
     @Test
     void contextLoads() {
-	  
+        // لو اشتغل يبقى الكونتكست تمام
     }
 
     @Test
-    void indexEndpointReturns200() {
-        webTestClient.get()
-                .uri("/")
-                .exchange()
-                .expectStatus().isOk();
+    void indexEndpointReturns200AndModel() throws Exception {
+        mockMvc.perform(get("/"))
+                .andExpect(status().isOk())
+                .andExpect(view().name("index"))
+                .andExpect(model().attributeExists("title"))
+                .andExpect(model().attributeExists("msg"));
     }
 }
 
