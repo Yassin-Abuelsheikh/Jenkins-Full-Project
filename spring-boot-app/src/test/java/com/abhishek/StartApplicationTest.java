@@ -29,5 +29,9 @@ class StartApplicationTest {
                 .andExpect(model().attributeExists("title"))
                 .andExpect(model().attributeExists("msg"));
     }
+    @Test
+    void mainMethodRuns() {
+        StartApplication.main(new String[] {});
+    }
 }
 
