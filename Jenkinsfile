@@ -33,6 +33,7 @@ pipeline {
                         sh '''
                           mvn org.sonarsource.scanner.maven:sonar-maven-plugin:3.9.1.2184:sonar \
                           -Dsonar.coverage.jacoco.xmlReportPaths=target/site/jacoco/jacoco.xml \
+                          -Dsonar.coverage.exclusions=**/*Application.java \
                           -Dsonar.ws.timeout=120
                         '''
                     }

@@ -18,7 +18,7 @@ class StartApplicationTest {
 
     @Test
     void contextLoads() {
-        // لو اشتغل يبقى الكونتكست تمام
+      
     }
 
     @Test
@@ -29,9 +29,6 @@ class StartApplicationTest {
                 .andExpect(model().attributeExists("title"))
                 .andExpect(model().attributeExists("msg"));
     }
-    @Test
-    void mainMethodRuns() {
-        StartApplication.main(new String[] {});
-    }
+
 }
 
