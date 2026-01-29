@@ -85,20 +85,23 @@ pipeline {
         /* ================= Trivy Image Scan ================= */
 
         stage('Trivy Image Scan (CRITICAL only)') {
-            steps {
-                sh '''
-                  docker run --rm \
-                  -v /var/run/docker.sock:/var/run/docker.sock \
-                  aquasec/trivy:latest image \
-                  --severity CRITICAL \
-                  --timeout 10m \
-                  --scanners vuln \
-                  --no-progress \
-                  --exit-code 1 \
-                  $DOCKERHUB_REPO:$IMAGE_TAG
-                '''
-            }
-        }
+           steps {
+               sh '''
+                 docker run --rm \
+                 -v /var/run/docker.sock:/var/run/docker.sock \
+                 -v $HOME/.cache/trivy:/root/.cache/ \
+                 aquasec/trivy:latest image \
+                 --timeout 30m \
+                 --severity CRITICAL \
+                 --exit-code 1 \
+                 --scanners vuln \
+                 --no-progress \
+                 $DOCKERHUB_REPO:$IMAGE_TAG
+               '''
+           }
+          }
+
+       
 
         stage('Push Docker Image to Docker Hub') {
             steps {

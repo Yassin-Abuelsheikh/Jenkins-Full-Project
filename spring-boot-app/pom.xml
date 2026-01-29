@@ -82,7 +82,8 @@
                     <excludes>
                         <exclude>java/**</exclude>
                         <exclude>javax/**</exclude>
-                        <exclude>jdk/**</exclude>
+			<exclude>jdk/**</exclude>
+			<exclude>com/abhishek/StartApplication*</exclude>
                     </excludes>
                 </configuration>
                 <executions>
